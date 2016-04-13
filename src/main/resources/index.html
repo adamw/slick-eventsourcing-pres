@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Slick-EventSourcing</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body>
+<div id="msg">
+
+</div>
+<div id="addtroll">
+    <form id="addtroll_form">
+        <h1>Add troll</h1>
+        <div>
+            Name: <input type="text" name="name" />
+        </div>
+        <div>
+            <input type="submit" value="Add" />
+        </div>
+    </form>
+</div>
+<pre id="trolls">
+
+</pre>
+</body>
+<script>
+    function getTrolls() {
+        $.get('/list_trolls')
+            .done(function(data) {
+                $("#trolls").html(data);
+            });
+    }
+
+    $("#addtroll_form [type=submit]").click(function(e) {
+        var name = $('#addtroll_form [name=name]').val();
+        $.ajax({
+            url: '/add_troll',
+            type: 'POST',
+            data: name
+        }).done(function() {
+            $('#msg').html('Troll added!');
+            getTrolls();
+        }).fail(function(data) {
+            $('#msg').html('Cannot add troll: ' + data.responseText);
+        });
+        e.preventDefault();
+    });
+
+    getTrolls();
+</script>
+</html>
