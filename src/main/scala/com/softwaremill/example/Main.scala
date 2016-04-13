@@ -5,9 +5,9 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.softwaremill.events.{EventsDatabase, EventsModule, Registry}
-import com.softwaremill.example.database.SchemaUpdate
 import com.softwaremill.id.DefaultIdGenerator
 import com.typesafe.scalalogging.StrictLogging
+import org.flywaydb.core.Flyway
 
 import scala.util.{Failure, Success}
 
@@ -22,6 +22,8 @@ object Main extends App with StrictLogging with EventsModule {
 
   lazy val idGenerator = new DefaultIdGenerator(datacenterId = 1)
 
+  // ---
+
   lazy val eventsDatabase = EventsDatabase.createH2(dbUrl)
   lazy val trollModel = new TrollModel(eventsDatabase)
 
@@ -35,16 +37,27 @@ object Main extends App with StrictLogging with EventsModule {
     .registerModelUpdate(modelUpdates.addedUpdate)
     .registerModelUpdate(modelUpdates.equipmentUpdate)
 
-  lazy val routes =
-    new Routes(eventsDatabase, eventMachine, trollModel, commands).routes ~
+  lazy val routes = new Routes(eventsDatabase, eventMachine, trollModel, commands)
+
+  // ---
+
+  lazy val routesWithIndex = routes.routes ~
       path("") {
         getFromResource("index.html")
       }
 
   Http()
-    .bindAndHandle(routes, "localhost", 8080)
+    .bindAndHandle(routesWithIndex, "localhost", 8080)
     .onComplete {
       case Success(b) => logger.info(s"Server started")
       case Failure(e) => logger.error(s"Cannot start server", e)
     }
+}
+
+object SchemaUpdate {
+  def update(connectionString: String) {
+    val flyway = new Flyway()
+    flyway.setDataSource(connectionString, "", "")
+    flyway.migrate()
+  }
 }
