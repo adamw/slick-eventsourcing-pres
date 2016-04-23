@@ -1,7 +1,7 @@
-CREATE TABLE "trolls"(
+CREATE TABLE "orders"(
     "id" BIGINT NOT NULL,
     "name" VARCHAR NOT NULL,
     "equipment" VARCHAR,
     PRIMARY KEY("id")
 );
-CREATE UNIQUE INDEX "trolls_name" ON "trolls"("name");
+CREATE UNIQUE INDEX "orders_name" ON "orders"("name");

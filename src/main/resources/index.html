@@ -8,44 +8,44 @@
 <div id="msg">
 
 </div>
-<div id="addtroll">
-    <form id="addtroll_form">
-        <h1>Add troll</h1>
+<div id="placeorder">
+    <form id="placeorder_form">
+        <h1>Place order for a Tesla model 3</h1>
         <div>
-            Name: <input type="text" name="name" />
+            Your name: <input type="text" name="name" />
         </div>
         <div>
-            <input type="submit" value="Add" />
+            <input type="submit" value="Order!" />
         </div>
     </form>
 </div>
-<pre id="trolls">
+<pre id="orders">
 
 </pre>
 </body>
 <script>
-    function getTrolls() {
-        $.get('/list_trolls')
+    function getOrders() {
+        $.get('/list_orders')
             .done(function(data) {
-                $("#trolls").html(data);
+                $("#orders").html(data);
             });
     }
 
-    $("#addtroll_form [type=submit]").click(function(e) {
-        var name = $('#addtroll_form [name=name]').val();
+    $("#placeorder_form [type=submit]").click(function(e) {
+        var name = $('#placeorder_form [name=name]').val();
         $.ajax({
-            url: '/add_troll',
+            url: '/place_order',
             type: 'POST',
             data: name
         }).done(function() {
-            $('#msg').html('Troll added!');
-            getTrolls();
+            $('#msg').html('Order placed! Now be patient');
+            getOrders();
         }).fail(function(data) {
-            $('#msg').html('Cannot add troll: ' + data.responseText);
+            $('#msg').html('Cannot place order: ' + data.responseText);
         });
         e.preventDefault();
     });
 
-    getTrolls();
+    getOrders();
 </script>
 </html>

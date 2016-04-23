@@ -25,7 +25,7 @@ object Main extends App with StrictLogging with EventsModule {
   // ---
 
   lazy val eventsDatabase = EventsDatabase.createH2(dbUrl)
-  lazy val trollModel = new TrollModel(eventsDatabase)
+  lazy val teslaOrderModel = new TeslaOrderModel(eventsDatabase)
 
   lazy val routes = new Routes()
 

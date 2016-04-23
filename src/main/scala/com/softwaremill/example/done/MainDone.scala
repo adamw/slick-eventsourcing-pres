@@ -5,7 +5,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.softwaremill.events.{EventsDatabase, EventsModule, Registry}
-import com.softwaremill.example.{SchemaUpdate, TrollModel}
+import com.softwaremill.example.{SchemaUpdate, TeslaOrderModel}
 import com.softwaremill.id.DefaultIdGenerator
 import com.typesafe.scalalogging.StrictLogging
 
@@ -25,19 +25,19 @@ object MainDone extends App with StrictLogging with EventsModule {
   // ---
 
   lazy val eventsDatabase = EventsDatabase.createH2(dbUrl)
-  lazy val trollModel = new TrollModel(eventsDatabase)
+  lazy val teslaOrderModel = new TeslaOrderModel(eventsDatabase)
 
-  lazy val commands = new CommandsDone(trollModel)
+  lazy val commands = new CommandsDone(teslaOrderModel)
   lazy val eventListeners = new EventListenersDone()
-  lazy val modelUpdates = new ModelUpdatesDone(trollModel)
+  lazy val modelUpdates = new ModelUpdatesDone(teslaOrderModel)
 
   lazy val registry = Registry()
-    .registerEventListener(eventListeners.notifyTrollOversightCouncil)
-    .registerEventListener(eventListeners.equipWithAxe)
-    .registerModelUpdate(modelUpdates.addedUpdate)
+    .registerEventListener(eventListeners.sendCustomerNotification)
+    .registerEventListener(eventListeners.addExtraEquipment)
+    .registerModelUpdate(modelUpdates.orderedUpdated)
     .registerModelUpdate(modelUpdates.equipmentUpdate)
 
-  lazy val routes = new RoutesDone(eventsDatabase, eventMachine, trollModel, commands)
+  lazy val routes = new RoutesDone(eventsDatabase, eventMachine, teslaOrderModel, commands)
 
   // ---
 

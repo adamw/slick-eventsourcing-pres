@@ -8,7 +8,7 @@ class Routes() {
 
   implicit val hc = HandleContext.System
 
-  val routes = path("add_troll") {
+  val routes = path("place_order") {
     post {
       entity(as[String]) { name =>
         complete {
@@ -16,7 +16,7 @@ class Routes() {
         }
       }
     }
-  } ~ path("list_trolls") {
+  } ~ path("list_orders") {
     get {
       complete {
         "ko"
