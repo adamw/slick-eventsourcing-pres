@@ -1,17 +1,17 @@
-package com.softwaremill.example
+package com.softwaremill.example.done
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.softwaremill.events.{EventsDatabase, EventsModule, Registry}
+import com.softwaremill.example.{SchemaUpdate, TrollModel}
 import com.softwaremill.id.DefaultIdGenerator
 import com.typesafe.scalalogging.StrictLogging
-import org.flywaydb.core.Flyway
 
 import scala.util.{Failure, Success}
 
-object Main extends App with StrictLogging with EventsModule {
+object MainDone extends App with StrictLogging with EventsModule {
   implicit lazy val _system = ActorSystem("slick-eventsourcing")
   implicit lazy val _materializer = ActorMaterializer()
   implicit lazy val ec = _system.dispatcher
@@ -27,9 +27,17 @@ object Main extends App with StrictLogging with EventsModule {
   lazy val eventsDatabase = EventsDatabase.createH2(dbUrl)
   lazy val trollModel = new TrollModel(eventsDatabase)
 
-  lazy val routes = new Routes()
+  lazy val commands = new CommandsDone(trollModel)
+  lazy val eventListeners = new EventListenersDone()
+  lazy val modelUpdates = new ModelUpdatesDone(trollModel)
 
   lazy val registry = Registry()
+    .registerEventListener(eventListeners.notifyTrollOversightCouncil)
+    .registerEventListener(eventListeners.equipWithAxe)
+    .registerModelUpdate(modelUpdates.addedUpdate)
+    .registerModelUpdate(modelUpdates.equipmentUpdate)
+
+  lazy val routes = new RoutesDone(eventsDatabase, eventMachine, trollModel, commands)
 
   // ---
 
@@ -46,10 +54,3 @@ object Main extends App with StrictLogging with EventsModule {
     }
 }
 
-object SchemaUpdate {
-  def update(connectionString: String) {
-    val flyway = new Flyway()
-    flyway.setDataSource(connectionString, "", "")
-    flyway.migrate()
-  }
-}
