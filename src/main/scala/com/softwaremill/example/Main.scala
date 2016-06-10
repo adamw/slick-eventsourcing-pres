@@ -34,9 +34,12 @@ object Main extends App with StrictLogging with EventsModule {
   // ---
 
   lazy val routesWithIndex = routes.routes ~
-      path("") {
-        getFromResource("index.html")
-      }
+    path("jquery.min.js") {
+      getFromResource("jquery.min.js")
+    } ~
+    path("") {
+      getFromResource("index.html")
+    }
 
   Http()
     .bindAndHandle(routesWithIndex, "localhost", 8080)

@@ -42,12 +42,15 @@ object MainDone extends App with StrictLogging with EventsModule {
   // ---
 
   lazy val routesWithIndex = routes.routes ~
-      path("") {
-        getFromResource("index.html")
-      }
+    path("jquery.min.js") {
+      getFromResource("jquery.min.js")
+    } ~
+    path("") {
+      getFromResource("index.html")
+    }
 
   Http()
-    .bindAndHandle(routesWithIndex, "localhost", 8080)
+    .bindAndHandle(routesWithIndex, "localhost", 8081)
     .onComplete {
       case Success(b) => logger.info(s"Server started")
       case Failure(e) => logger.error(s"Cannot start server", e)
